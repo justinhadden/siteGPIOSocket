@@ -1,0 +1,42 @@
+<!doctype html>  
+<html lang="en">  
+    <head>
+	<script src="/jquery/dist/jquery.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		var socket = io.connect('http://192.168.1.122:8000');
+		socket.on('connect', function(data) {
+			socket.emit('join', 'Made it');
+		});
+		socket.on('messages', function(data){
+			console.log(data);
+		});
+	</script>
+    </head>
+    <body>
+        <h1>Hello World!</h1>
+        <div id="future"></div>
+        <form id="form">
+            <input id="ledOn" type="hidden" value="1">
+            <input type="submit" value="On">
+        </form>
+	<form id="off_form">
+		<input id="ledOff" type="hidden" valiue="0">
+		<input type="submit" value="Off">
+	</form>
+    </body>
+	<script>
+		$(document).ready(function(){
+			$('form').submit(function(e){
+				e.preventDefault();
+                        	var message = $('#ledOn').val();
+                        	socket.emit('messages', message);
+               	 	});
+			$("#off_form").submit(function(e){
+				e.preventDefault();
+				var message = $("#ledOff").val();
+				socket.emit('messages', message);
+			});
+		});
+	</script>
+</html>  

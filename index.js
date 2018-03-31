@@ -1,13 +1,29 @@
 var express = require("express");
 var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
 
 var gpio = require("onoff").Gpio;
 var LED = new gpio(13,'out');
-app.get('/', function(req,res){
-	res.send("test");
+var LED2 = new gpio(4, 'out');
+
+app.use(express.static(__dirname + '/node_modules'));
+
+app.get('/', function(req,res,next){
+	res.sendFile(__dirname + "/index.html");
 });
 
-app.listen(8000, function(){
-	console.log("Light on...");
-	LED.writeSync(0);
+server.listen(8000);
+
+io.on('connection', function(client) {
+	console.log('Client connected...');
+
+	client.on('join', function(data) {
+		client.emit('messages', 'Hello from server');
+	});
+
+	client.on('messages', function(data){
+		LED.writeSync(parseInt(data));
+		LED.writeSync(parseInt(data));
+	});
 });
